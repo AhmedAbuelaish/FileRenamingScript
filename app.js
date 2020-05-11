@@ -4,10 +4,10 @@ const colors = require('colors/safe')
 const csv = require('csvtojson')
 const path = require('path')
 
-var directory
-var folderFileList
-var jsonFileList
+var modFilesLocation = 'RenamedDocuments\\'
+// var modFilesLocation = ''
 
+// 'walk' through every file, then drill down through every directory to create a list of all the files including their filepaths
 var walk = function (dir, done) {
 	var results = []
 	fs.readdir(dir, function (err, list) {
@@ -32,8 +32,9 @@ var walk = function (dir, done) {
 	})
 }
 
+// 
 const countFilesPromise = (fp) => {
-	console.log('in count files promise')
+	console.log('counting files...')
 	return new Promise((resolve, reject) => {
 		walk(fp, function (err, results) {
 			if (err) throw err
@@ -49,22 +50,24 @@ const countFilesPromise = (fp) => {
 }
 
 const renameFilesPromise = (allFiles) => {
-	console.log('in rename files promise')
+	console.log('searching for matches...')
 	let fp = allFiles[0]
 	let currFiles = allFiles[1]
 	let newFiles = allFiles[2]
-	let renamedFiles = []
 	// console.log(currFiles,newFiles)
 	return new Promise((resolve, reject) => {
 		for (const file of currFiles) {
 			for (var i = 0; i < newFiles.length; i++) {
 				// console.log(file,newFiles[i].Document)
 				if (newFiles[i].Document.indexOf(file) != -1) {
-					let currPath = file.substring(0, file.lastIndexOf('\\') + 1)
-					console.log(currPath)
+					if (!modFilesLocation) {
+						let currPath = file.substring(0, file.lastIndexOf('\\') + 1)
+						modFilesLocation = currPath
+						console.log(currPath)
+					}
 					console.log('matched file:', file)
 					console.log(colors.red('renaming', file), colors.green('to', newFiles[i].NewFileName))
-					fs.rename(fp + '\\' + file, fp + '\\' + currPath + newFiles[i].NewFileName, (err) => {
+					fs.rename(fp + '\\' + file, fp + '\\' + modFilesLocation + newFiles[i].NewFileName, (err) => {
 						if (err) {
 							console.log(err)
 							reject(err)
@@ -118,7 +121,6 @@ const readCSV = (fp) => {
 		csv()
 			.fromFile(fp + '\\000FileNames000.csv')
 			.then((jsonObj) => {
-				jsonFileList = jsonObj
 				resolve(jsonObj)
 			})
 	})
@@ -144,36 +146,5 @@ prompt.get(schema, function (err, result) {
 	compareFileLists(result.path)
 		.then((allLists) => fileCountCheck(allLists))
 		.then((allLists) => renameFilesPromise(allLists))
-		// 	})
-		// 	.then((allFileLists) => fileCountCheck(allFileLists))
-		// 	.then((result) =>
-		// 		renameFilesPromise(directory, '\\file title 1.txt', '\\FileTitle1.txt').then((result) =>
-		// 			console.log('renamed file', colors.red(result[0]), 'to', colors.green(result[1]))
-		// 		)
-		// 	)
 		.catch((err) => console.log(colors.red('all catch' + err)))
 })
-
-// prompt.start()
-// prompt.get({
-// 	name: 'path',
-// 	description: colors.yellow('enter folder path:'),
-// 	pattern: /^(?:[\w]\:|\\)(\\[a-zA-Z_\-\s0-9\.\/\\]+)$/,
-// 	message: colors.red('File path must only contain valid characters'),
-// 	required: true,
-// },function(err,result){console.log(result)})
-
-// prompt.get(
-// 	{
-// 		name: 'confirmation',
-// 		type: 'confirm',
-// 		description: colors.green('\ndoes this look right? (Y/N)'),
-// 		message: colors.red('Y/N'),
-// 		initial: true,
-// 	},
-// 	function (err, result) {
-// 		console.log('   Confimation: ' + result.confirm)
-// 	}
-// )
-
-// renameFiles(directory, '\\file title 1.txt', '\\FileTitle1.txt')
