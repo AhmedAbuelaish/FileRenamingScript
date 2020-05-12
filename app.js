@@ -54,11 +54,10 @@ const renameFilesPromise = (allFiles) => {
 	let fp = allFiles[0]
 	let currFiles = allFiles[1]
 	let newFiles = allFiles[2]
-	// console.log(currFiles,newFiles)
+	let matched = []
 	return new Promise((resolve, reject) => {
 		for (const file of currFiles) {
 			for (var i = 0; i < newFiles.length; i++) {
-				// console.log(file,newFiles[i].Document)
 				if (newFiles[i].Document.indexOf(file) != -1) {
 					if (!modFilesLocation) {
 						let currPath = file.substring(0, file.lastIndexOf('\\') + 1)
@@ -66,13 +65,14 @@ const renameFilesPromise = (allFiles) => {
 						console.log(currPath)
 					}
 					console.log('matched file:', file)
+					matched.push(file)
 					console.log(colors.red('renaming', file), colors.green('to', newFiles[i].NewFileName))
 					fs.rename(fp + '\\' + file, fp + '\\' + modFilesLocation + newFiles[i].NewFileName, (err) => {
 						if (err) {
 							console.log(err)
 							reject(err)
 						}
-						resolve()
+						resolve(matched)
 					})
 				}
 			}
@@ -146,5 +146,6 @@ prompt.get(schema, function (err, result) {
 	compareFileLists(result.path)
 		.then((allLists) => fileCountCheck(allLists))
 		.then((allLists) => renameFilesPromise(allLists))
+		.then((matches)=>console.log(colors.green('renamed', matches.length, 'files')))
 		.catch((err) => console.log(colors.red('all catch' + err)))
 })
