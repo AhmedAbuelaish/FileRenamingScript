@@ -1,4 +1,4 @@
-#FileRenamingScript
+# FileRenamingScript
 
 The purpose of this script is to mass-rename files based on a csv file. The files can be renamed in-place (without changing the folder structure) or renamed and moved to a specified directory.
 
