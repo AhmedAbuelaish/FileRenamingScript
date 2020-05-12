@@ -12,5 +12,3 @@ The basic folder structure needed is as follows:
 
 ## 000FileNames000.csv
 The csv file must contain the following two columns:
-
-csv Structure.PNG
