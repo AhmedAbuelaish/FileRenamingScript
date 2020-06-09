@@ -107,6 +107,8 @@ const renameFilesPromise = (allFiles) => {
 	let fileCount = newFiles.length
 	let matched = []
 	let renamed = []
+	let unmatched = []
+
 	return new Promise((resolve, reject) => {
 		for (var i = 0; i < fileCount; i++) {
 			for (const file of currFiles) {
@@ -115,6 +117,17 @@ const renameFilesPromise = (allFiles) => {
 						let currPath = file.substring(0, file.lastIndexOf('\\') + 1)
 						modFilesLocation = currPath
 						console.log(currPath)
+					}
+					console.log('~~~~~~~~~~~~~')
+					console.log(colors.blue(matched.length, unmatched.length, i))
+					if (matched.length + unmatched.length !== i) {
+						// this checks if the previous file is unaccounted for.
+						// if it is then push it into unmatched and notify the user
+						for (var j = i - matched.length; j > 0; j--) {
+							unmatched.push(newFiles[i - j].NewFileName)
+							console.log('-------------------------')
+							console.log(colors.red('Missing file:', newFiles[i - j].Document))
+						}
 					}
 
 					// Match files from CSV in directory
@@ -134,6 +147,7 @@ const renameFilesPromise = (allFiles) => {
 						renamed.push(newFiles[i].NewFileName)
 					}
 
+					console.log(colors.blue(matched.length, unmatched.length, i))
 					// Check if user wants to rename files or is just checking for errors
 					if (confirmRename) {
 						// Rename file and log file name before & after
@@ -149,7 +163,6 @@ const renameFilesPromise = (allFiles) => {
 						// Confirm that file can be renamed. log file name before & after
 						console.log(colors.green(file), 'can be renamed to', colors.green(newFiles[i].NewFileName))
 					}
-
 					// Log full process status
 					console.log(
 						colors.yellow(
@@ -160,10 +173,13 @@ const renameFilesPromise = (allFiles) => {
 							'. \n',
 							renamed.length,
 							'Successfully renamed.',
+							unmatched.length,
+							'Unmatched renamed.',
 							Math.abs(matched.length - renamed.length),
 							'Potential errors.'
 						)
 					)
+					console.log(colors.blue(matched.length, unmatched.length, i))
 				}
 			}
 		}
