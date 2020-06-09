@@ -118,8 +118,6 @@ const renameFilesPromise = (allFiles) => {
 						modFilesLocation = currPath
 						console.log(currPath)
 					}
-					console.log('~~~~~~~~~~~~~')
-					console.log(colors.blue(matched.length, unmatched.length, i))
 					if (matched.length + unmatched.length !== i) {
 						// this checks if the previous file is unaccounted for.
 						// if it is then push it into unmatched and notify the user
@@ -147,7 +145,6 @@ const renameFilesPromise = (allFiles) => {
 						renamed.push(newFiles[i].NewFileName)
 					}
 
-					console.log(colors.blue(matched.length, unmatched.length, i))
 					// Check if user wants to rename files or is just checking for errors
 					if (confirmRename) {
 						// Rename file and log file name before & after
@@ -179,7 +176,6 @@ const renameFilesPromise = (allFiles) => {
 							'Potential errors.'
 						)
 					)
-					console.log(colors.blue(matched.length, unmatched.length, i))
 				}
 			}
 		}
